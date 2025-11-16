@@ -1,3 +1,5 @@
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -9,6 +11,8 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.File;
 import java.util.Scanner;
+import java.io.BufferedReader;
+import java.io.FileReader;
 
 /**
  * CPS510 Assignment 9 -  Oracle Connection Demo
@@ -129,4 +133,52 @@ public class JdbcOracleConnectionTemplate {
             }
         }
     }
+
+	    // ===================== HELPER METHODS FOR UI =====================
+    public static Connection connect(String username, String password) {
+        Connection conn = null;
+        String url = "jdbc:oracle:thin:@oracle.scs.ryerson.ca:1521:orcl";
+        try {
+            Class.forName("oracle.jdbc.OracleDriver");
+            conn = DriverManager.getConnection(url, username, password);
+            System.out.println("✅ Connected to Oracle DB as " + username);
+        } catch (Exception e) {
+            System.err.println("❌ Connection failed: " + e.getMessage());
+        }
+        return conn;
+    }
+
+    public static void runSQLFile(Connection conn, String filePath) {
+        if (conn == null) {
+            System.err.println("❌ No connection to run SQL file.");
+            return;
+        }
+
+        try (BufferedReader br = new BufferedReader(new java.io.FileReader(filePath));
+             Statement stmt = conn.createStatement()) {
+
+            StringBuilder sb = new StringBuilder();
+            String line;
+
+            while ((line = br.readLine()) != null) {
+                if (line.trim().isEmpty() || line.startsWith("--"))
+                    continue;
+
+                sb.append(line).append(" ");
+                if (line.trim().endsWith(";")) {
+                    String sql = sb.toString().replace(";", "");
+                    stmt.execute(sql);
+                    sb.setLength(0);
+                }
+            }
+
+            System.out.println("✅ Successfully executed: " + filePath);
+
+        } catch (SQLException e) {
+            System.err.println("❌ SQL Error: " + e.getMessage());
+        } catch (Exception e) {
+            System.err.println("❌ File Error: " + e.getMessage());
+        }
+    }
+
 }

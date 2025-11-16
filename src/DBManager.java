@@ -74,5 +74,8 @@ public class DBManager {
             System.err.println("Error closing connection: " + e.getMessage());
         }
     }
+	public Connection getConnection() {
+    return conn;
+	}
 }
 
