@@ -1,9 +1,8 @@
-# 📘 CPS510 Assignment 9 — Oracle Database with Java UI
+# 📘 CPS510 — Oracle E-Commerce Database Project with Java UI
 
 ### 🏫 Toronto Metropolitan University  
 **Course:** CPS510 – Database Systems  
-**Project Title:** SQL E-Commerce Database with Java UI  
-**Submission Date:** Week of Nov 17 (Project Demo)  
+**Project Title:** SQL E-Commerce Database with Java UI 
 
 ---
 
