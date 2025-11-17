@@ -12,7 +12,7 @@
 |------|------|--------------|
 | **Basmulla Atekulla** | Lead Developer & Database Integrator | Set up Oracle 11g connection, configured JDBC driver, developed and tested Java Swing UI, and managed GitHub repository. |
 | **Rochelle Deanna** | UI/UX Designer | Enhanced the Swing UI layout and appearance, organized panels and buttons, wrote demo notes and documentation. |
-| **Michelle** | SQL Architect & Tester | Designed and verified `CREATE`, `INSERT`, and `SELECT` SQL scripts; ensured normalization (3NF/BCNF) and consistent dummy records. |
+| **Michelle Bui** | SQL Architect & Tester | Designed and verified `CREATE`, `INSERT`, and `SELECT` SQL scripts; ensured normalization (3NF/BCNF) and consistent dummy records. |
 
 ---
 
