@@ -10,6 +10,7 @@ import java.sql.*;
  * UI_Main.java - Enhanced E-Commerce Database UI with Better Display
  * Authors: Basmulla Atekulla, Rochelle, Michelle
  * Enhanced: Improved formatting, tables, colors, and visual appeal
+ * Fixed: Table headers now properly visible
  */
 public class UI_Main extends JFrame {
 
@@ -330,7 +331,7 @@ public class UI_Main extends JFrame {
         }
     }
 
-    // --- DISPLAY QUERY IN TABLE FORMAT
+    // --- DISPLAY QUERY IN TABLE FORMAT (FIXED HEADERS)
     private void displayQueryInTable(String title, String query) {
         if (conn == null) {
             appendToOutput("⚠️ No active connection.\n\n");
@@ -372,26 +373,51 @@ public class UI_Main extends JFrame {
             table.setGridColor(new Color(230, 230, 230));
             table.setSelectionBackground(new Color(232, 240, 254));
             table.setSelectionForeground(Color.BLACK);
+            table.setShowGrid(true);
+            table.setIntercellSpacing(new Dimension(1, 1));
             
-            // Style header
+            // *** FIXED: Make header visible with proper styling ***
             JTableHeader header = table.getTableHeader();
+            header.setOpaque(true);  // Make sure it's opaque
             header.setBackground(primaryColor);
             header.setForeground(Color.WHITE);
-            header.setFont(new Font("Arial", Font.BOLD, 12));
-            header.setPreferredSize(new Dimension(header.getWidth(), 35));
+            header.setFont(new Font("Arial", Font.BOLD, 13));
+            header.setPreferredSize(new Dimension(0, 40));  // Fixed height
+            header.setBorder(BorderFactory.createLineBorder(primaryColor, 2));
+            header.setReorderingAllowed(false);  // Prevent column reordering
             
-            // Center align numeric columns
+            // Make header text more visible
+            DefaultTableCellRenderer headerRenderer = (DefaultTableCellRenderer) header.getDefaultRenderer();
+            headerRenderer.setHorizontalAlignment(JLabel.CENTER);
+            headerRenderer.setBackground(primaryColor);
+            headerRenderer.setForeground(Color.WHITE);
+            headerRenderer.setFont(new Font("Arial", Font.BOLD, 13));
+            
+            // Center align numeric columns and apply formatting
             DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
             centerRenderer.setHorizontalAlignment(JLabel.CENTER);
+            
+            DefaultTableCellRenderer rightRenderer = new DefaultTableCellRenderer();
+            rightRenderer.setHorizontalAlignment(JLabel.RIGHT);
+            
             for (int i = 0; i < colCount; i++) {
                 String colName = columnNames[i].toUpperCase();
                 if (colName.contains("ID") || colName.contains("QUANTITY") || 
-                    colName.contains("PRICE") || colName.contains("TOTAL") || 
-                    colName.contains("DAYS") || colName.contains("COUNT")) {
+                    colName.contains("DAYS") || colName.contains("COUNT") || colName.contains("FREQUENCY")) {
                     table.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
+                } else if (colName.contains("PRICE") || colName.contains("TOTAL") || 
+                           colName.contains("REVENUE") || colName.contains("MONETARY")) {
+                    table.getColumnModel().getColumn(i).setCellRenderer(rightRenderer);
                 }
             }
 
+            // Create scroll pane with visible header
+            JScrollPane scrollPane = new JScrollPane(table);
+            scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+            scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+            scrollPane.getViewport().setBackground(Color.WHITE);
+            scrollPane.setBorder(BorderFactory.createLineBorder(new Color(200, 200, 200), 1));
+            
             // Update table panel
             tablePanel.removeAll();
             
@@ -400,18 +426,18 @@ public class UI_Main extends JFrame {
             headerPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
             
             JLabel titleLabel = new JLabel(title);
-            titleLabel.setFont(new Font("Arial", Font.BOLD, 16));
+            titleLabel.setFont(new Font("Arial", Font.BOLD, 18));
             titleLabel.setForeground(primaryColor);
             
             JLabel countLabel = new JLabel(rowCount + " row(s)");
-            countLabel.setFont(new Font("Arial", Font.PLAIN, 12));
+            countLabel.setFont(new Font("Arial", Font.PLAIN, 13));
             countLabel.setForeground(Color.GRAY);
             
             headerPanel.add(titleLabel, BorderLayout.WEST);
             headerPanel.add(countLabel, BorderLayout.EAST);
             
             tablePanel.add(headerPanel, BorderLayout.NORTH);
-            tablePanel.add(new JScrollPane(table), BorderLayout.CENTER);
+            tablePanel.add(scrollPane, BorderLayout.CENTER);
             tablePanel.revalidate();
             tablePanel.repaint();
             
