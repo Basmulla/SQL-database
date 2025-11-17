@@ -1,90 +1,148 @@
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.JTableHeader;
+import javax.swing.table.DefaultTableCellRenderer;
 import java.awt.*;
 import java.awt.event.*;
 import java.sql.*;
 
 /**
- * UI_Main.java E-Commerce Database Swing Interface for Oracle 11g 
+ * UI_Main.java - Enhanced E-Commerce Database UI with Better Display
  * Authors: Basmulla Atekulla, Rochelle, Michelle
- * Fixed: Added proper credential validation and error handling
+ * Enhanced: Improved formatting, tables, colors, and visual appeal
  */
 public class UI_Main extends JFrame {
 
     private Connection conn;
     private JTextArea outputArea;
+    private JTabbedPane tabbedPane;
+    private JPanel tablePanel;
+    private Color primaryColor = new Color(102, 126, 234);
+    private Color accentColor = new Color(118, 75, 162);
 
     public UI_Main() {
-        super("CPS510 E-Commerce Database UI");
+        super("CPS510 E-Commerce Database - Enhanced UI");
 
-        setLayout(new BorderLayout());
+        setLayout(new BorderLayout(10, 10));
+        
+        // Add padding to main frame
+        ((JPanel)getContentPane()).setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
-        // --- Left Panel (Buttons)
-        JPanel buttonPanel = new JPanel();
-        buttonPanel.setLayout(new GridLayout(11, 1, 5, 5));
+        // --- TOP PANEL: Title and Connection Status
+        JPanel topPanel = new JPanel(new BorderLayout());
+        topPanel.setBackground(primaryColor);
+        topPanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
+        
+        JLabel titleLabel = new JLabel("🏪 E-Commerce Database Management System");
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 20));
+        titleLabel.setForeground(Color.WHITE);
+        topPanel.add(titleLabel, BorderLayout.WEST);
+        
+        add(topPanel, BorderLayout.NORTH);
 
-        JButton btnDrop = new JButton("Drop Tables");
-        JButton btnCreate = new JButton("Create Tables");
-        JButton btnPopulate = new JButton("Populate Tables");
-        JButton btnViewProducts = new JButton("View Products");
-        JButton btnAnalytics = new JButton("Run Analytics");
-        JButton btnExit = new JButton("Exit");
+        // --- LEFT PANEL: Buttons with Categories
+        JPanel leftPanel = new JPanel();
+        leftPanel.setLayout(new BoxLayout(leftPanel, BoxLayout.Y_AXIS));
+        leftPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        leftPanel.setBackground(new Color(245, 245, 245));
 
-        /* Advanced Report buttons */
-        JButton btnRFM = new JButton("Customer RFM Snapshot");
-        JButton btnOrderHealth = new JButton("Order Health Check");
-        JButton btnRevenue = new JButton("Revenue by Brand");
-        JButton btnLowStock = new JButton("Low Stock Alert");
-        JButton btnSLA = new JButton("Shipping SLA Aging");
+        // Database Operations Section
+        addSectionLabel(leftPanel, "📊 Database Operations");
+        JButton btnDrop = createStyledButton("Drop Tables", new Color(231, 76, 60));
+        JButton btnCreate = createStyledButton("Create Tables", new Color(46, 204, 113));
+        JButton btnPopulate = createStyledButton("Populate Tables", new Color(52, 152, 219));
+        
+        leftPanel.add(btnDrop);
+        leftPanel.add(Box.createRigidArea(new Dimension(0, 5)));
+        leftPanel.add(btnCreate);
+        leftPanel.add(Box.createRigidArea(new Dimension(0, 5)));
+        leftPanel.add(btnPopulate);
+        leftPanel.add(Box.createRigidArea(new Dimension(0, 15)));
 
-        buttonPanel.add(btnDrop);
-        buttonPanel.add(btnCreate);
-        buttonPanel.add(btnPopulate);
-        buttonPanel.add(btnViewProducts);
-        buttonPanel.add(btnAnalytics);
-        buttonPanel.add(btnRFM);
-        buttonPanel.add(btnOrderHealth);
-        buttonPanel.add(btnRevenue);
-        buttonPanel.add(btnLowStock);
-        buttonPanel.add(btnSLA);
-        buttonPanel.add(btnExit);
+        // View Data Section
+        addSectionLabel(leftPanel, "👁️ View Data");
+        JButton btnViewProducts = createStyledButton("View Products", new Color(155, 89, 182));
+        JButton btnViewCustomers = createStyledButton("View Customers", new Color(155, 89, 182));
+        JButton btnViewOrders = createStyledButton("View Orders", new Color(155, 89, 182));
+        
+        leftPanel.add(btnViewProducts);
+        leftPanel.add(Box.createRigidArea(new Dimension(0, 5)));
+        leftPanel.add(btnViewCustomers);
+        leftPanel.add(Box.createRigidArea(new Dimension(0, 5)));
+        leftPanel.add(btnViewOrders);
+        leftPanel.add(Box.createRigidArea(new Dimension(0, 15)));
 
-        add(buttonPanel, BorderLayout.WEST);
+        // Analytics Section
+        addSectionLabel(leftPanel, "📈 Analytics & Reports");
+        JButton btnRFM = createStyledButton("Customer RFM", new Color(230, 126, 34));
+        JButton btnRevenue = createStyledButton("Revenue by Brand", new Color(230, 126, 34));
+        JButton btnLowStock = createStyledButton("Low Stock Alert", new Color(192, 57, 43));
+        JButton btnShipping = createStyledButton("Shipping Status", new Color(230, 126, 34));
+        
+        leftPanel.add(btnRFM);
+        leftPanel.add(Box.createRigidArea(new Dimension(0, 5)));
+        leftPanel.add(btnRevenue);
+        leftPanel.add(Box.createRigidArea(new Dimension(0, 5)));
+        leftPanel.add(btnLowStock);
+        leftPanel.add(Box.createRigidArea(new Dimension(0, 5)));
+        leftPanel.add(btnShipping);
+        leftPanel.add(Box.createRigidArea(new Dimension(0, 15)));
 
-        // --- Center Panel (Output)
+        // System Section
+        addSectionLabel(leftPanel, "⚙️ System");
+        JButton btnClear = createStyledButton("Clear Output", new Color(149, 165, 166));
+        JButton btnExit = createStyledButton("Exit", new Color(52, 73, 94));
+        
+        leftPanel.add(btnClear);
+        leftPanel.add(Box.createRigidArea(new Dimension(0, 5)));
+        leftPanel.add(btnExit);
+        
+        JScrollPane leftScrollPane = new JScrollPane(leftPanel);
+        leftScrollPane.setPreferredSize(new Dimension(220, 0));
+        leftScrollPane.setBorder(BorderFactory.createEmptyBorder());
+        add(leftScrollPane, BorderLayout.WEST);
+
+        // --- CENTER PANEL: Tabbed View
+        tabbedPane = new JTabbedPane();
+        tabbedPane.setFont(new Font("Arial", Font.PLAIN, 12));
+        
+        // Text Output Tab
         outputArea = new JTextArea();
         outputArea.setEditable(false);
-        outputArea.setFont(new Font("Monospaced", Font.PLAIN, 12));
-        add(new JScrollPane(outputArea), BorderLayout.CENTER);
+        outputArea.setFont(new Font("Consolas", Font.PLAIN, 12));
+        outputArea.setMargin(new Insets(10, 10, 10, 10));
+        JScrollPane outputScrollPane = new JScrollPane(outputArea);
+        tabbedPane.addTab("📝 Console Output", outputScrollPane);
+        
+        // Table View Tab
+        tablePanel = new JPanel(new BorderLayout());
+        tablePanel.setBackground(Color.WHITE);
+        JLabel placeholderLabel = new JLabel("Select a view option to display data in table format", SwingConstants.CENTER);
+        placeholderLabel.setFont(new Font("Arial", Font.ITALIC, 14));
+        placeholderLabel.setForeground(Color.GRAY);
+        tablePanel.add(placeholderLabel, BorderLayout.CENTER);
+        tabbedPane.addTab("📊 Table View", tablePanel);
+        
+        add(tabbedPane, BorderLayout.CENTER);
 
-        // --- IMPROVED CREDENTIAL HANDLING ---
+        // --- LOGIN AND CONNECTION
         DBManager db = new DBManager();
         String username = null;
         String password = null;
         boolean validCredentials = false;
 
-        // Try up to 3 times to get valid credentials
         for (int attempt = 1; attempt <= 3; attempt++) {
-            // Get username
             username = JOptionPane.showInputDialog(this, 
                 "Enter Oracle username" + (attempt > 1 ? " (Attempt " + attempt + "/3)" : "") + ":",
                 "Database Login",
                 JOptionPane.QUESTION_MESSAGE);
 
-            // Check if user clicked Cancel
             if (username == null) {
-                outputArea.append("⚠️ Login cancelled by user.\n");
-                JOptionPane.showMessageDialog(this, 
-                    "Login cancelled. Application will exit.",
-                    "Login Cancelled", 
-                    JOptionPane.WARNING_MESSAGE);
                 System.exit(0);
             }
 
             username = username.trim();
-            
-            // Validate username is not empty
             if (username.isEmpty()) {
-                outputArea.append("❌ Username cannot be empty (Attempt " + attempt + "/3).\n");
                 JOptionPane.showMessageDialog(this, 
                     "Username cannot be empty. Please try again.",
                     "Invalid Input", 
@@ -92,7 +150,6 @@ public class UI_Main extends JFrame {
                 continue;
             }
 
-            // Get password
             JPasswordField pf = new JPasswordField();
             int okCxl = JOptionPane.showConfirmDialog(this, pf, 
                 "Enter Oracle password for user: " + username, 
@@ -100,19 +157,11 @@ public class UI_Main extends JFrame {
                 JOptionPane.PLAIN_MESSAGE);
 
             if (okCxl != JOptionPane.OK_OPTION) {
-                outputArea.append("⚠️ Login cancelled by user.\n");
-                JOptionPane.showMessageDialog(this, 
-                    "Login cancelled. Application will exit.",
-                    "Login Cancelled", 
-                    JOptionPane.WARNING_MESSAGE);
                 System.exit(0);
             }
 
             password = new String(pf.getPassword()).trim();
-
-            // Validate password is not empty
             if (password.isEmpty()) {
-                outputArea.append("❌ Password cannot be empty (Attempt " + attempt + "/3).\n");
                 JOptionPane.showMessageDialog(this, 
                     "Password cannot be empty. Please try again.",
                     "Invalid Input", 
@@ -120,137 +169,176 @@ public class UI_Main extends JFrame {
                 continue;
             }
 
-            // Credentials are valid (not empty), break the loop
             validCredentials = true;
             break;
         }
 
-        // If after 3 attempts we don't have valid credentials, exit
         if (!validCredentials) {
-            outputArea.append("❌ Maximum login attempts exceeded. Exiting.\n");
-            JOptionPane.showMessageDialog(this, 
-                "Maximum login attempts exceeded.",
-                "Login Failed", 
-                JOptionPane.ERROR_MESSAGE);
             System.exit(0);
         }
 
-        // --- Try to Connect ---
-        outputArea.append("🔄 Attempting to connect to Oracle DB...\n");
-        outputArea.append("    Host: oracle.scs.ryerson.ca:1521\n");
-        outputArea.append("    User: " + username + "\n\n");
+        // Update title with connection status
+        JLabel statusLabel = new JLabel();
+        statusLabel.setFont(new Font("Arial", Font.PLAIN, 12));
+        statusLabel.setForeground(Color.WHITE);
         
         if (db.connect(username, password)) {
             conn = db.getConnection();
-            outputArea.append("✅ Connected to Oracle DB as " + username + "\n");
-            outputArea.append("    Connection successful!\n\n");
-            
-            JOptionPane.showMessageDialog(this, 
-                "Successfully connected to database!",
-                "Connection Success", 
-                JOptionPane.INFORMATION_MESSAGE);
+            statusLabel.setText("✅ Connected as: " + username + " | oracle.scs.ryerson.ca:1521");
+            appendToOutput("╔════════════════════════════════════════════════════════════╗\n");
+            appendToOutput("║          CONNECTION ESTABLISHED SUCCESSFULLY              ║\n");
+            appendToOutput("╚════════════════════════════════════════════════════════════╝\n");
+            appendToOutput("User: " + username + "\n");
+            appendToOutput("Host: oracle.scs.ryerson.ca:1521\n");
+            appendToOutput("Database: orcl\n\n");
         } else {
-            outputArea.append("❌ Failed to connect to Oracle DB.\n");
-            outputArea.append("   Possible reasons:\n");
-            outputArea.append("   - Incorrect username or password\n");
-            outputArea.append("   - Not connected to TMU VPN (required for off-campus access)\n");
-            outputArea.append("   - Database server is down\n");
-            outputArea.append("   - JDBC driver (ojdbc6.jar) not found\n\n");
-            
-            int retry = JOptionPane.showConfirmDialog(this,
-                "Failed to connect to database.\n\n" +
-                "Common solutions:\n" +
-                "• Verify username and password\n" +
-                "• Connect to TMU VPN if off-campus\n" +
-                "• Check that ojdbc6.jar is in /lib folder\n\n" +
-                "Would you like to try again?",
-                "Connection Failed",
-                JOptionPane.YES_NO_OPTION,
-                JOptionPane.ERROR_MESSAGE);
-            
-            if (retry == JOptionPane.YES_OPTION) {
-                dispose();
-                SwingUtilities.invokeLater(UI_Main::new);
-                return;
-            } else {
-                System.exit(0);
-            }
+            statusLabel.setText("❌ Connection Failed");
+            statusLabel.setForeground(new Color(231, 76, 60));
+            appendToOutput("❌ Failed to connect to Oracle DB.\n");
+            appendToOutput("Please check credentials and VPN connection.\n\n");
         }
+        
+        topPanel.add(statusLabel, BorderLayout.EAST);
 
-        // --- Button Actions ---
+        // --- BUTTON ACTIONS
         btnDrop.addActionListener(e -> runSQL("sql/01_drop_tables.sql"));
         btnCreate.addActionListener(e -> runSQL("sql/02_create_tables.sql"));
         btnPopulate.addActionListener(e -> runSQL("sql/03_populate_tables.sql"));
-        btnViewProducts.addActionListener(e -> displayQuery("SELECT * FROM Product"));
         
-        // Fixed: Product table doesn't have Category column, use Brand instead
-        btnAnalytics.addActionListener(e -> 
-            displayQuery("SELECT Brand, COUNT(*) AS TotalProducts, SUM(StockQuantity) AS TotalStock " +
-                        "FROM Product GROUP BY Brand ORDER BY TotalProducts DESC"));
+        btnViewProducts.addActionListener(e -> displayQueryInTable("Products", 
+            "SELECT ProductID, Name, Brand, Price, StockQuantity, IsActive FROM Product ORDER BY ProductID"));
         
-        // Advanced Reports - using fixed version
-        btnRFM.addActionListener(e -> AdvancedReports.customerRFMSnapshot(conn, outputArea));
-        btnOrderHealth.addActionListener(e -> AdvancedReports.orderHealthCheck(conn, outputArea));
-        btnRevenue.addActionListener(e -> AdvancedReports.productRevenueByCategory(conn, outputArea));
-        btnLowStock.addActionListener(e -> AdvancedReports.lowStockAlert(conn, outputArea));
-        btnSLA.addActionListener(e -> AdvancedReports.shippingSLAAging(conn, outputArea));
+        btnViewCustomers.addActionListener(e -> displayQueryInTable("Customers",
+            "SELECT CustomerID, Name, Email, Phone, Address FROM Customer ORDER BY CustomerID"));
+        
+        btnViewOrders.addActionListener(e -> displayQueryInTable("Orders",
+            "SELECT o.OrderID, c.Name AS Customer, o.OrderDate, o.Status, o.OrderTotal, s.Name AS Staff " +
+            "FROM Orders o JOIN Customer c ON o.CustomerID = c.CustomerID " +
+            "LEFT JOIN Staff s ON o.StaffID = s.StaffID ORDER BY o.OrderDate DESC"));
+        
+        btnRFM.addActionListener(e -> displayQueryInTable("Customer RFM Analysis",
+            "SELECT c.CustomerID, c.Name, MAX(o.OrderDate) AS LastPurchase, " +
+            "ROUND(SYSDATE - MAX(o.OrderDate)) AS RecencyDays, COUNT(o.OrderID) AS Frequency, " +
+            "NVL(SUM(o.OrderTotal), 0) AS MonetaryValue FROM Customer c " +
+            "LEFT JOIN Orders o ON c.CustomerID = o.CustomerID GROUP BY c.CustomerID, c.Name " +
+            "ORDER BY MonetaryValue DESC"));
+        
+        btnRevenue.addActionListener(e -> displayQueryInTable("Revenue by Brand",
+            "SELECT p.Brand, COUNT(DISTINCT p.ProductID) AS Products, SUM(od.Quantity) AS UnitsSold, " +
+            "SUM(od.Quantity * od.PurchasePrice) AS Revenue FROM Product p " +
+            "JOIN OrderDetails od ON p.ProductID = od.ProductID GROUP BY p.Brand ORDER BY Revenue DESC"));
+        
+        btnLowStock.addActionListener(e -> displayQueryInTable("Low Stock Alert",
+            "SELECT ProductID, Name, Brand, StockQuantity, Price, " +
+            "CASE WHEN StockQuantity = 0 THEN 'OUT OF STOCK' " +
+            "WHEN StockQuantity <= 5 THEN 'LOW STOCK' " +
+            "WHEN StockQuantity <= 15 THEN 'MODERATE' ELSE 'SUFFICIENT' END AS Status " +
+            "FROM Product WHERE IsActive = 'Y' ORDER BY StockQuantity ASC"));
+        
+        btnShipping.addActionListener(e -> displayQueryInTable("Shipping Status",
+            "SELECT s.ShippingID, s.OrderID, c.Name AS Customer, s.Courier, s.TrackingNum, " +
+            "s.Status, ROUND(SYSDATE - o.OrderDate) AS DaysAgo FROM Shipping s " +
+            "JOIN Orders o ON s.OrderID = o.OrderID JOIN Customer c ON o.CustomerID = c.CustomerID " +
+            "ORDER BY o.OrderDate DESC"));
+        
+        btnClear.addActionListener(e -> {
+            outputArea.setText("");
+            tablePanel.removeAll();
+            JLabel placeholder = new JLabel("Output cleared. Select a view option.", SwingConstants.CENTER);
+            placeholder.setFont(new Font("Arial", Font.ITALIC, 14));
+            placeholder.setForeground(Color.GRAY);
+            tablePanel.add(placeholder, BorderLayout.CENTER);
+            tablePanel.revalidate();
+            tablePanel.repaint();
+        });
 
         btnExit.addActionListener(e -> {
             int confirm = JOptionPane.showConfirmDialog(this,
                 "Are you sure you want to exit?",
                 "Confirm Exit",
                 JOptionPane.YES_NO_OPTION);
-            
             if (confirm == JOptionPane.YES_OPTION) {
                 closeConnection();
                 System.exit(0);
             }
         });
 
-        // --- Frame Settings ---
-        setSize(1000, 600);
+        // --- FRAME SETTINGS
+        setSize(1200, 700);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
-        setLocationRelativeTo(null); // Center on screen
+        setLocationRelativeTo(null);
         setVisible(true);
     }
 
-    // --- Run SQL Script ---
+    // --- HELPER METHOD: Add Section Label
+    private void addSectionLabel(JPanel panel, String text) {
+        JLabel label = new JLabel(text);
+        label.setFont(new Font("Arial", Font.BOLD, 11));
+        label.setForeground(new Color(52, 73, 94));
+        label.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        label.setAlignmentX(Component.LEFT_ALIGNMENT);
+        panel.add(label);
+    }
+
+    // --- HELPER METHOD: Create Styled Button
+    private JButton createStyledButton(String text, Color color) {
+        JButton button = new JButton(text);
+        button.setFont(new Font("Arial", Font.PLAIN, 12));
+        button.setBackground(color);
+        button.setForeground(Color.WHITE);
+        button.setFocusPainted(false);
+        button.setBorderPainted(false);
+        button.setAlignmentX(Component.LEFT_ALIGNMENT);
+        button.setMaximumSize(new Dimension(200, 35));
+        button.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        
+        // Hover effect
+        button.addMouseListener(new MouseAdapter() {
+            public void mouseEntered(MouseEvent e) {
+                button.setBackground(color.brighter());
+            }
+            public void mouseExited(MouseEvent e) {
+                button.setBackground(color);
+            }
+        });
+        
+        return button;
+    }
+
+    // --- HELPER METHOD: Append to Output
+    private void appendToOutput(String text) {
+        outputArea.append(text);
+        outputArea.setCaretPosition(outputArea.getDocument().getLength());
+    }
+
+    // --- RUN SQL SCRIPT
     private void runSQL(String path) {
         if (conn == null) {
-            outputArea.append("⚠️ No active connection.\n");
-            JOptionPane.showMessageDialog(this,
-                "No database connection available.\nPlease restart and login.",
-                "Connection Error",
-                JOptionPane.WARNING_MESSAGE);
+            appendToOutput("⚠️ No active connection.\n\n");
             return;
         }
 
-        outputArea.append("🔄 Running " + path + "...\n");
+        appendToOutput("\n▶ Running: " + path + "\n");
+        appendToOutput("─".repeat(60) + "\n");
+        
         try {
             JdbcOracleConnectionTemplate.runSQLFile(conn, path);
-            outputArea.append("✅ Completed: " + path + "\n\n");
+            appendToOutput("✅ Successfully completed: " + path + "\n");
+            appendToOutput("─".repeat(60) + "\n\n");
         } catch (Exception ex) {
-            outputArea.append("❌ Error executing " + path + ": " + ex.getMessage() + "\n\n");
-            JOptionPane.showMessageDialog(this,
-                "Error executing SQL file:\n" + ex.getMessage(),
-                "SQL Error",
-                JOptionPane.ERROR_MESSAGE);
+            appendToOutput("❌ Error: " + ex.getMessage() + "\n\n");
         }
     }
 
-    // --- Execute SELECT Query ---
-    private void displayQuery(String query) {
+    // --- DISPLAY QUERY IN TABLE FORMAT
+    private void displayQueryInTable(String title, String query) {
         if (conn == null) {
-            outputArea.append("⚠️ No active connection.\n");
-            JOptionPane.showMessageDialog(this,
-                "No database connection available.\nPlease restart and login.",
-                "Connection Error",
-                JOptionPane.WARNING_MESSAGE);
+            appendToOutput("⚠️ No active connection.\n\n");
             return;
         }
 
-        outputArea.append("🔄 Executing query...\n");
-        outputArea.append("Query: " + query + "\n\n");
+        appendToOutput("\n▶ Executing: " + title + "\n");
+        appendToOutput("─".repeat(60) + "\n");
 
         try (Statement stmt = conn.createStatement(); 
              ResultSet rs = stmt.executeQuery(query)) {
@@ -258,60 +346,105 @@ public class UI_Main extends JFrame {
             ResultSetMetaData md = rs.getMetaData();
             int colCount = md.getColumnCount();
 
-            // Print column headers
-            StringBuilder header = new StringBuilder();
-            for (int i = 1; i <= colCount; i++) {
-                header.append(String.format("%-20s", md.getColumnName(i)));
+            // Get column names
+            String[] columnNames = new String[colCount];
+            for (int i = 0; i < colCount; i++) {
+                columnNames[i] = md.getColumnName(i + 1);
             }
-            outputArea.append(header.toString() + "\n");
-            outputArea.append("-".repeat(colCount * 20) + "\n");
 
-            // Print rows
+            // Get data
+            DefaultTableModel model = new DefaultTableModel(columnNames, 0);
             int rowCount = 0;
+            
             while (rs.next()) {
-                StringBuilder row = new StringBuilder();
-                for (int i = 1; i <= colCount; i++) {
-                    String value = rs.getString(i);
-                    row.append(String.format("%-20s", value != null ? value : "NULL"));
+                Object[] row = new Object[colCount];
+                for (int i = 0; i < colCount; i++) {
+                    row[i] = rs.getObject(i + 1);
                 }
-                outputArea.append(row.toString() + "\n");
+                model.addRow(row);
                 rowCount++;
             }
+
+            // Create table with styling
+            JTable table = new JTable(model);
+            table.setFont(new Font("Arial", Font.PLAIN, 12));
+            table.setRowHeight(25);
+            table.setGridColor(new Color(230, 230, 230));
+            table.setSelectionBackground(new Color(232, 240, 254));
+            table.setSelectionForeground(Color.BLACK);
             
-            outputArea.append("\n✅ Query completed. " + rowCount + " row(s) returned.\n\n");
+            // Style header
+            JTableHeader header = table.getTableHeader();
+            header.setBackground(primaryColor);
+            header.setForeground(Color.WHITE);
+            header.setFont(new Font("Arial", Font.BOLD, 12));
+            header.setPreferredSize(new Dimension(header.getWidth(), 35));
+            
+            // Center align numeric columns
+            DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+            centerRenderer.setHorizontalAlignment(JLabel.CENTER);
+            for (int i = 0; i < colCount; i++) {
+                String colName = columnNames[i].toUpperCase();
+                if (colName.contains("ID") || colName.contains("QUANTITY") || 
+                    colName.contains("PRICE") || colName.contains("TOTAL") || 
+                    colName.contains("DAYS") || colName.contains("COUNT")) {
+                    table.getColumnModel().getColumn(i).setCellRenderer(centerRenderer);
+                }
+            }
+
+            // Update table panel
+            tablePanel.removeAll();
+            
+            JPanel headerPanel = new JPanel(new BorderLayout());
+            headerPanel.setBackground(Color.WHITE);
+            headerPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+            
+            JLabel titleLabel = new JLabel(title);
+            titleLabel.setFont(new Font("Arial", Font.BOLD, 16));
+            titleLabel.setForeground(primaryColor);
+            
+            JLabel countLabel = new JLabel(rowCount + " row(s)");
+            countLabel.setFont(new Font("Arial", Font.PLAIN, 12));
+            countLabel.setForeground(Color.GRAY);
+            
+            headerPanel.add(titleLabel, BorderLayout.WEST);
+            headerPanel.add(countLabel, BorderLayout.EAST);
+            
+            tablePanel.add(headerPanel, BorderLayout.NORTH);
+            tablePanel.add(new JScrollPane(table), BorderLayout.CENTER);
+            tablePanel.revalidate();
+            tablePanel.repaint();
+            
+            // Switch to table tab
+            tabbedPane.setSelectedIndex(1);
+
+            appendToOutput("✅ Query completed. " + rowCount + " row(s) displayed in Table View.\n");
+            appendToOutput("─".repeat(60) + "\n\n");
 
         } catch (SQLException ex) {
-            outputArea.append("❌ SQL Error: " + ex.getMessage() + "\n");
-            outputArea.append("   Error Code: " + ex.getErrorCode() + "\n");
-            outputArea.append("   SQL State: " + ex.getSQLState() + "\n\n");
-            
-            JOptionPane.showMessageDialog(this,
-                "SQL Error:\n" + ex.getMessage() + "\n\n" +
-                "Error Code: " + ex.getErrorCode(),
-                "Query Error",
-                JOptionPane.ERROR_MESSAGE);
+            appendToOutput("❌ SQL Error: " + ex.getMessage() + "\n");
+            appendToOutput("   Error Code: " + ex.getErrorCode() + "\n\n");
         }
     }
 
-    // --- Close DB Connection ---
+    // --- CLOSE CONNECTION
     private void closeConnection() {
         try {
             if (conn != null && !conn.isClosed()) {
                 conn.close();
-                outputArea.append("🔒 Connection closed successfully.\n");
+                appendToOutput("🔒 Connection closed successfully.\n");
             }
         } catch (SQLException e) {
-            outputArea.append("⚠️ Error closing connection: " + e.getMessage() + "\n");
+            appendToOutput("⚠️ Error closing connection: " + e.getMessage() + "\n");
         }
     }
 
-    // --- Launch Application ---
+    // --- MAIN
     public static void main(String[] args) {
-        // Set look and feel to system default for better appearance
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (Exception e) {
-            // Use default if system look and feel fails
+            // Use default look and feel
         }
         
         SwingUtilities.invokeLater(UI_Main::new);
