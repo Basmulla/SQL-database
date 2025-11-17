@@ -20,7 +20,7 @@ public class UI_Main extends JFrame {
 
         // --- Left Panel (Buttons)
         JPanel buttonPanel = new JPanel();
-        buttonPanel.setLayout(new GridLayout(6, 1, 5, 5));
+        buttonPanel.setLayout(new GridLayout(11, 1, 5, 5));
 
         JButton btnDrop = new JButton("Drop Tables");
         JButton btnCreate = new JButton("Create Tables");
@@ -47,7 +47,7 @@ public class UI_Main extends JFrame {
         buttonPanel.add(btnRevenue);
         buttonPanel.add(btnLowStock);
         buttonPanel.add(btnSLA);
-        
+
         buttonPanel.add(btnExit);
 
         add(buttonPanel, BorderLayout.WEST);
