@@ -83,6 +83,22 @@ public class UI_Main extends JFrame {
         btnViewProducts.addActionListener(e -> displayQuery("SELECT * FROM Product"));
         btnAnalytics.addActionListener(e
                 -> displayQuery("SELECT Category, COUNT(*) AS TotalProducts FROM Product GROUP BY Category"));
+        //button actions for Advanced reports
+        btnRFM.addActionListener(e
+                -> AdvancedReports.customerRFMSnapshot(conn, outputArea));
+
+        btnOrderHealth.addActionListener(e
+                -> AdvancedReports.orderHealthCheck(conn, outputArea));
+
+        btnRevenue.addActionListener(e
+                -> AdvancedReports.productRevenueByCategory(conn, outputArea));
+
+        btnLowStock.addActionListener(e
+                -> AdvancedReports.lowStockAlert(conn, outputArea));
+
+        btnSLA.addActionListener(e
+                -> AdvancedReports.shippingSLAAging(conn, outputArea));
+
         btnExit.addActionListener(e -> {
             closeConnection();
             System.exit(0);
