@@ -1,16 +1,3 @@
-/* 
-  CPS510
-  E-commerce Database (Advanced Analytics Phase)
-  Authors: Basmulla Atekulla, Michelle & Rochelle
-  ------------------------------------------------
-  Purpose: Builds analytical queries, snapshots, and BI-style reports.
-  ------------------------------------------------
-*/
-
-PROMPT ===============================================================
-PROMPT   📊  ADVANCED ANALYTICS & INSIGHTS
-PROMPT ===============================================================
-
 -----------------------------------------------------------------------
 -- 1️⃣ CUSTOMER RFM SNAPSHOT (Recency, Frequency, Monetary)
 -----------------------------------------------------------------------
@@ -31,8 +18,6 @@ FROM Customer c
 LEFT JOIN Orders o ON c.CustomerID = o.CustomerID
 GROUP BY c.CustomerID, c.Name;
 
-PROMPT ✅ View 'Customer_RFM' created successfully.
-
 -----------------------------------------------------------------------
 -- 2️⃣ PRODUCT PROFITABILITY SNAPSHOT
 -----------------------------------------------------------------------
@@ -50,8 +35,6 @@ FROM Product p
 JOIN OrderDetails od ON p.ProductID = od.ProductID
 GROUP BY p.ProductID, p.Name, p.Brand, p.Price;
 
-PROMPT ✅ View 'Product_Profitability' created successfully.
-
 -----------------------------------------------------------------------
 -- 3️⃣ INVENTORY ALERTS (Low Stock)
 -----------------------------------------------------------------------
@@ -68,8 +51,6 @@ SELECT
     END AS StockStatus
 FROM Product p
 ORDER BY p.StockQuantity ASC;
-
-PROMPT ✅ View 'Low_Stock_Alerts' created successfully.
 
 -----------------------------------------------------------------------
 -- 4️⃣ SHIPPING SLA MONITORING (Aging Analysis)
@@ -93,8 +74,6 @@ FROM Shipping s
 JOIN Orders o ON s.OrderID = o.OrderID
 JOIN Customer c ON o.CustomerID = c.CustomerID;
 
-PROMPT ✅ View 'Shipping_Aging' created successfully.
-
 -----------------------------------------------------------------------
 -- 5️⃣ PAYMENT METHOD DISTRIBUTION
 -----------------------------------------------------------------------
@@ -106,8 +85,6 @@ SELECT
     ROUND(AVG(pay.Amount), 2) AS AvgPayment
 FROM Payment pay
 GROUP BY pay.PaymentMethod;
-
-PROMPT ✅ View 'Payment_Distribution' created successfully.
 
 -----------------------------------------------------------------------
 -- 6️⃣ STAFF PERFORMANCE (Orders Processed + Revenue)
@@ -123,8 +100,6 @@ FROM Staff s
 LEFT JOIN Orders o ON s.StaffID = o.StaffID
 GROUP BY s.StaffID, s.Name, s.Role;
 
-PROMPT ✅ View 'Staff_Performance_Summary' created successfully.
-
 -----------------------------------------------------------------------
 -- 7️⃣ AGGREGATED DASHBOARD SNAPSHOT
 -----------------------------------------------------------------------
@@ -138,15 +113,9 @@ SELECT
     (SELECT COUNT(*) FROM Staff) AS Total_Staff
 FROM dual;
 
-PROMPT ✅ View 'System_Dashboard' created successfully.
-
 -----------------------------------------------------------------------
 -- 8️⃣ EXECUTION QUERIES (VERIFICATION)
 -----------------------------------------------------------------------
-PROMPT ===============================================================
-PROMPT   📄  RUNNING ANALYTICAL REPORTS
-PROMPT ===============================================================
-
 -- Customer Engagement Summary
 SELECT * FROM Customer_RFM ORDER BY RecencyDays;
 
@@ -168,8 +137,3 @@ SELECT * FROM Staff_Performance_Summary ORDER BY TotalValueProcessed DESC;
 -- System Overview Snapshot
 SELECT * FROM System_Dashboard;
 
-PROMPT ---------------------------------------------------------------
-PROMPT ✅ All Analytics Views and Reports generated successfully.
-PROMPT ---------------------------------------------------------------
-
-EXIT;

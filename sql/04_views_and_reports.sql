@@ -1,17 +1,4 @@
-/* 
-  CPS510
-  E-commerce Database Schema (Views & Reports Phase)
-  Authors: Basmulla Atekulla, Michelle & Rochelle
-  ------------------------------------------------
-  Purpose: Creates all SQL views, rollups, and report queries.
-  ------------------------------------------------
-*/
-
-PROMPT ===============================================================
-PROMPT   📈  BUILDING VIEWS AND REPORT QUERIES
-PROMPT ===============================================================
-
------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------------------------------------------
 -- VIEW 1: Customer_Rollup
 -----------------------------------------------------------------------
 CREATE OR REPLACE VIEW Customer_Rollup AS
@@ -28,8 +15,6 @@ FROM Customer c
 LEFT JOIN Orders  o   ON o.CustomerID = c.CustomerID
 LEFT JOIN Payment pay ON pay.OrderID   = o.OrderID
 GROUP BY c.CustomerID, c.Name, c.Email;
-
-PROMPT ✅ View 'Customer_Rollup' created successfully.
 
 -----------------------------------------------------------------------
 -- VIEW 2: Customer_OrderLines
@@ -51,8 +36,6 @@ FROM Customer c
 JOIN Orders o        ON o.CustomerID = c.CustomerID
 JOIN OrderDetails od ON od.OrderID   = o.OrderID
 JOIN Product p       ON p.ProductID  = od.ProductID;
-
-PROMPT ✅ View 'Customer_OrderLines' created successfully.
 
 -----------------------------------------------------------------------
 -- VIEW 3: OrderDetails_ProductInfo
@@ -80,8 +63,6 @@ LEFT JOIN Books b ON p.ProductID = b.ProductID
 LEFT JOIN Clothing c ON p.ProductID = c.ProductID
 LEFT JOIN Electronics e ON p.ProductID = e.ProductID;
 
-PROMPT ✅ View 'OrderDetails_ProductInfo' created successfully.
-
 -----------------------------------------------------------------------
 -- VIEW 4: OrderDetails_CustomerSummary
 -----------------------------------------------------------------------
@@ -102,8 +83,6 @@ JOIN Orders o ON c.CustomerID = o.CustomerID
 JOIN OrderDetails od ON o.OrderID = od.OrderID
 JOIN Product p ON od.ProductID = p.ProductID;
 
-PROMPT ✅ View 'OrderDetails_CustomerSummary' created successfully.
-
 -----------------------------------------------------------------------
 -- VIEW 5: OrderDetails_StaffPerformance
 -----------------------------------------------------------------------
@@ -121,8 +100,6 @@ FROM Staff s
 JOIN Orders o ON s.StaffID = o.StaffID
 JOIN OrderDetails od ON o.OrderID = od.OrderID
 JOIN Product p ON od.ProductID = p.ProductID;
-
-PROMPT ✅ View 'OrderDetails_StaffPerformance' created successfully.
 
 -----------------------------------------------------------------------
 -- VIEW 6: OrderDetails_PaymentShipping
@@ -146,8 +123,6 @@ JOIN Product p ON od.ProductID = p.ProductID
 LEFT JOIN Payment pay ON o.OrderID = pay.OrderID
 LEFT JOIN Shipping ship ON o.OrderID = ship.OrderID;
 
-PROMPT ✅ View 'OrderDetails_PaymentShipping' created successfully.
-
 -----------------------------------------------------------------------
 -- VIEW 7: ShippingInformation
 -----------------------------------------------------------------------
@@ -168,15 +143,9 @@ FROM Shipping s
 JOIN Orders o ON s.OrderID = o.OrderID
 JOIN Customer c ON o.CustomerID = c.CustomerID;
 
-PROMPT ✅ View 'ShippingInformation' created successfully.
-
 -----------------------------------------------------------------------
 -- REPORTS AND VERIFICATION QUERIES
 -----------------------------------------------------------------------
-PROMPT ===============================================================
-PROMPT   📄  RUNNING VERIFICATION REPORTS
-PROMPT ===============================================================
-
 -- Customers Summary
 SELECT * FROM Customer_Rollup ORDER BY "Customer Name";
 
@@ -225,8 +194,3 @@ FROM Customer_OrderLines v
 GROUP BY v."Customer ID", v."Customer Name", NVL(v."Brand", 'Unbranded')
 ORDER BY v."Customer Name", "Revenue ($)" DESC;
 
-PROMPT ---------------------------------------------------------------
-PROMPT ✅ All Views and Reports created successfully.
-PROMPT ---------------------------------------------------------------
-
-EXIT;
