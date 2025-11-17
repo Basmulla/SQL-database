@@ -3,8 +3,18 @@ import java.sql.*;
 /**
  * AdvancedReports.java
  * Fixed to match the actual database schema in 02_create_tables.sql
+ * Updated for full Java 8 compatibility (removed String.repeat)
  */
 public class AdvancedReports {
+
+    // -------------------------------------------------------------
+    // Utility: Java 8-safe string repeater
+    // -------------------------------------------------------------
+    private static String repeatStr(String s, int count) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < count; i++) sb.append(s);
+        return sb.toString();
+    }
 
     // -------------------------------------------------------------
     // 1. Customer RFM Snapshot (FIXED)
@@ -27,7 +37,6 @@ public class AdvancedReports {
         executeAndPrint(conn, output, query);
     }
 
-
     // -------------------------------------------------------------
     // 2. Order Health Check (Payment vs Order Total)
     // -------------------------------------------------------------
@@ -48,9 +57,8 @@ public class AdvancedReports {
         executeAndPrint(conn, output, query);
     }
 
-
     // -------------------------------------------------------------
-    // 3. Product Revenue by Brand (FIXED - no Category column exists)
+    // 3. Product Revenue by Brand
     // -------------------------------------------------------------
     public static void productRevenueByCategory(Connection conn, javax.swing.JTextArea output) {
         String query =
@@ -68,9 +76,8 @@ public class AdvancedReports {
         executeAndPrint(conn, output, query);
     }
 
-
     // -------------------------------------------------------------
-    // 4. Low-Stock Alert (FIXED)
+    // 4. Low-Stock Alert
     // -------------------------------------------------------------
     public static void lowStockAlert(Connection conn, javax.swing.JTextArea output) {
         String query =
@@ -94,9 +101,8 @@ public class AdvancedReports {
         executeAndPrint(conn, output, query);
     }
 
-
     // -------------------------------------------------------------
-    // 5. Shipping SLA Aging (FIXED)
+    // 5. Shipping SLA Aging
     // -------------------------------------------------------------
     public static void shippingSLAAging(Connection conn, javax.swing.JTextArea output) {
         String query =
@@ -125,9 +131,8 @@ public class AdvancedReports {
         executeAndPrint(conn, output, query);
     }
 
-
     // -------------------------------------------------------------
-    // 6. BONUS: Staff Performance Report
+    // 6. Staff Performance Report
     // -------------------------------------------------------------
     public static void staffPerformanceReport(Connection conn, javax.swing.JTextArea output) {
         String query =
@@ -147,9 +152,8 @@ public class AdvancedReports {
         executeAndPrint(conn, output, query);
     }
 
-
     // -------------------------------------------------------------
-    // 7. BONUS: Product Category Breakdown (Books, Clothing, Electronics)
+    // 7. Product Category Breakdown
     // -------------------------------------------------------------
     public static void productCategoryBreakdown(Connection conn, javax.swing.JTextArea output) {
         String query =
@@ -172,45 +176,45 @@ public class AdvancedReports {
         executeAndPrint(conn, output, query);
     }
 
-
     // -------------------------------------------------------------
-    // Helper method: Execute query and print results in table format
+    // Helper: Execute a query and print formatted output
     // -------------------------------------------------------------
     private static void executeAndPrint(Connection conn, javax.swing.JTextArea output, String query) {
+
         try (Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(query)) {
 
             ResultSetMetaData md = rs.getMetaData();
             int columns = md.getColumnCount();
 
-            // Print header
+            // Header
             StringBuilder header = new StringBuilder();
             for (int i = 1; i <= columns; i++) {
                 header.append(String.format("%-25s", md.getColumnName(i)));
             }
             output.append(header.toString() + "\n");
 
-            // Print divider
-            output.append("=".repeat(columns * 25) + "\n");
+            // Divider (Java 8 safe)
+            output.append(repeatStr("=", columns * 25) + "\n");
 
-            // Print rows
+            // Rows
             int rowCount = 0;
             while (rs.next()) {
                 StringBuilder row = new StringBuilder();
                 for (int i = 1; i <= columns; i++) {
-                    String value = rs.getString(i);
-                    row.append(String.format("%-25s", value != null ? value : "NULL"));
+                    String val = rs.getString(i);
+                    row.append(String.format("%-25s", val != null ? val : "NULL"));
                 }
                 output.append(row.toString() + "\n");
                 rowCount++;
             }
 
-            // Print summary
             if (rowCount == 0) {
                 output.append("(No data found)\n");
             } else {
                 output.append("\n✅ " + rowCount + " row(s) returned.\n");
             }
+
             output.append("\n");
 
         } catch (SQLException e) {
