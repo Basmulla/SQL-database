@@ -1,0 +1,10 @@
+# Ignore compiled class files
+*.class
+bin/
+
+# Ignore local scripts
+run.sh
+
+# Ignore backup or temp files
+*.log
+*.tmp
