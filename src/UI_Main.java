@@ -35,7 +35,7 @@ public class UI_Main extends JFrame {
         
         JLabel titleLabel = new JLabel("🏪 E-Commerce Database Management System");
         titleLabel.setFont(new Font("Arial", Font.BOLD, 20));
-        titleLabel.setForeground(Color.WHITE);
+        titleLabel.setForeground(Color.BLACK);
         topPanel.add(titleLabel, BorderLayout.WEST);
         
         add(topPanel, BorderLayout.NORTH);
@@ -150,7 +150,7 @@ public class UI_Main extends JFrame {
 
         JLabel statusLabel = new JLabel();
         statusLabel.setFont(new Font("Arial", Font.PLAIN, 12));
-        statusLabel.setForeground(Color.WHITE);
+        statusLabel.setForeground(Color.BLACK);
 
         if (!validCredentials) System.exit(0);
 
@@ -250,7 +250,7 @@ public class UI_Main extends JFrame {
         JButton button = new JButton(text);
         button.setFont(new Font("Arial", Font.PLAIN, 12));
         button.setBackground(color);
-        button.setForeground(Color.WHITE);
+        button.setForeground(Color.BLACK);
         button.setFocusPainted(false);
         button.setBorderPainted(false);
         button.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -325,7 +325,7 @@ public class UI_Main extends JFrame {
             JTableHeader header = table.getTableHeader();
             header.setOpaque(true);
             header.setBackground(primaryColor);
-            header.setForeground(Color.WHITE);
+            header.setForeground(Color.BLACK);
             header.setFont(new Font("Arial", Font.BOLD, 13));
             header.setPreferredSize(new Dimension(0, 40));
             header.setReorderingAllowed(false);
@@ -334,7 +334,7 @@ public class UI_Main extends JFrame {
             DefaultTableCellRenderer headerRenderer = (DefaultTableCellRenderer) header.getDefaultRenderer();
             headerRenderer.setOpaque(true);
             headerRenderer.setBackground(primaryColor);  
-            headerRenderer.setForeground(Color.WHITE);   
+            headerRenderer.setForeground(Color.BLACK);   
             headerRenderer.setFont(new Font("Arial", Font.BOLD, 13));
             headerRenderer.setHorizontalAlignment(JLabel.CENTER);
 
